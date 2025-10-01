@@ -1,11 +1,26 @@
 {
   "name": "usupovo-life-hall",
-  "version": "1.0.0", 
+  "version": "1.0.0",
+  "description": "Usupovo Life Hall - Ticket Booking and Verification System",
+  "main": "server.js",
   "scripts": {
-    "start": "node server/server.js",
-    "postinstall": "cd server && npm install"
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "tickets",
+    "booking",
+    "qr-scanner",
+    "event-management"
+  ],
+  "author": "IliaBebebe",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "sqlite3": "^5.1.6"
   },
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   }
 }
