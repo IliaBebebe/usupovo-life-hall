@@ -9,7 +9,7 @@ const PORT = 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // База данных
 const db = new sqlite3.Database('./usupovo-hall.db', (err) => {
