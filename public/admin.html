@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель - Usupovo Life Hall</title>
+    <style>
+/* Стили для защиты - ПОЛНОЭКРАННАЯ ЗАЩИТА */
+        .admin-login {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .login-form {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .login-form h2 {
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+            font-size: 1.5rem;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 1.5rem;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .login-form input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .login-form button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            width: 100%;
+            transition: background 0.3s ease;
+        }
+
+        .login-form button:hover {
+            background: #2980b9;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 1rem;
+            font-weight: bold;
+            display: none;
+        }
+
+        /* Основной контент админ-панели СКРЫТ до входа */
+        #adminContent {
+            display: none;
+        }
+
+        /* Остальные стили админ-панели */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f6fa;
+            color: #2c3e50;
+        }
+
+        .admin-header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .admin-nav {
+            background: #34495e;
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .admin-nav button {
+            background: none;
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .admin-nav button.active {
+            background: #3498db;
+        }
+
+        .admin-nav button:hover {
+            background: #2980b9;
+        }
+        .admin-nav button.ticket-checker {
+            background: #27ae60;
+            margin-left: auto;
+        }
+
+        .admin-nav button.ticket-checker:hover {
+            background: #229954;
+        }
+
+        .admin-content {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            border-left: 5px solid #3498db;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 1.25rem;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-active {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .status-used {
+            background: #3498db;
+            color: white;
+        }
+        
+        .status-cancelled {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .status-past {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .status-upcoming {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.25rem;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+        }
+        
+        .btn-info {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            outline: none;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: #95a5a6;
+            font-style: italic;
+        }
+        
+        .error-message {
+            text-align: center;
+            padding: 2rem;
+            color: #e74c3c;
+            background: #fdf2f2;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* Стили для схемы зала */
+        .seats-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .seat-legend {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid #ddd;
+        }
+        
+        .legend-standard { background: #27ae60; }
+        .legend-vip { background: #e67e22; }
+        .legend-occupied { background: #e74c3c; }
+        .legend-blocked { background: #7f8c8d; }
+        
+        .stage {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 1.5rem 3rem;
+            border-radius: 12px;
+            display: inline-block;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        .seats-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .seat-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .row-label {
+            font-weight: bold;
+            color: #2c3e50;
+            min-width: 60px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .seat {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        
+        .seat:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .seat-standard {
+            background: #27ae60;
+            color: white;
+            border-color: #219653;
+        }
+        
+        .seat-vip {
+            background: #e67e22;
+            color: white;
+            border-color: #d35400;
+        }
+        
+        .seat-occupied {
+            background: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+            cursor: not-allowed;
+        }
+        
+        .seat-blocked {
+            background: #7f8c8d;
+            color: white;
+            border-color: #636e72;
+            cursor: not-allowed;
+        }
+        
+        .seat-editor {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            margin-top: 2rem;
+            border: 2px solid #3498db;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        /* Модальные окна */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 2rem;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalAppear 0.3s ease-out;
+        }
+        
+        @keyframes modalAppear {
+            from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #ecf0f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .modal-body {
+            padding: 2rem;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .info-item label {
+            font-weight: 600;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .info-item.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .notification-content {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-left: 4px solid #3498db;
+            min-width: 300px;
+        }
+        
+        .notification-success {
+            border-left-color: #27ae60;
+        }
+        
+        .notification-error {
+            border-left-color: #e74c3c;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #7f8c8d;
+            margin-left: auto;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .admin-nav {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .admin-nav button {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .admin-content {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .seats-controls {
+                flex-direction: column;
+            }
+            
+            .seat-legend {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .action-buttons {
+                justify-content: center;
+            }
+            
+            .modal-content {
+                margin: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Форма входа -->
+    <div id="adminLogin" class="admin-login">
+        <div class="login-form">
+            <h2>🔐 Вход в админ-панель</h2>
+            <input type="password" id="adminPassword" placeholder="Введите пароль">
+            <button onclick="checkAdminPassword()">Войти</button>
+            <div id="loginError" class="error-message">❌ Неверный пароль</div>
+        </div>
+    </div>
+    <div id="adminContent" style="display: none;"></div>
+        <header class="admin-header">
+            <h1>🎭 Usupovo Life Hall - Админ-панель</h1>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div id="currentTime"></div>
+            </div>
+        </header>
+        
+        <nav class="admin-nav">
+            <button onclick="showSection('dashboard')" class="active">📊 Дашборд</button>
+            <button onclick="showSection('bookings')">🎫 Бронирования</button>
+            <button onclick="showSection('events')">📅 Мероприятия</button>
+            <button onclick="showSection('newEvent')">➕ Новое мероприятие</button>
+            <button onclick="showSection('seatsManagement')">💺 Управление местами</button>
+            <button onclick="openTicketChecker()" class="ticket-checker">🎫 Режим билетёра</button>
+            <button onclick="logoutAdmin()" style="background: #e74c3c; margin-left: auto;">🚪 Выйти</button>
+        </nav>
+        
+        <main class="admin-content">
+            <!-- Дашборд -->
+            <section id="dashboard" class="section active">
+                <h2>📊 Общая статистика</h2>
+                <div class="stats-grid" id="statsGrid">
+                    <div class="loading">Загрузка статистики...</div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <h2>📈 Последние бронирования</h2>
+                        <div class="table-container">
+                            <div id="recentBookings">
+                                <div class="loading">Загрузка бронирований...</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h2>🎪 Ближайшие мероприятия</h2>
+                        <div class="table-container">
+                            <div id="upcomingEvents">
+                                <div class="loading">Загрузка мероприятий...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Все бронирования -->
+            <section id="bookings" class="section">
+                <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                    <h2 style="margin: 0;">🎫 Все бронирования</h2>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <input type="text" id="searchBookings" placeholder="🔍 Поиск по гостям..." style="padding: 0.75rem; border: 2px solid #bdc3c7; border-radius: 8px; min-width: 250px;">
+                        <button class="btn btn-info" onclick="admin.exportBookings()">📤 Экспорт CSV</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <div id="allBookings">
+                        <div class="loading">Загрузка бронирований...</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Мероприятия -->
+            <section id="events" class="section">
+                <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                    <h2 style="margin: 0;">📅 Все мероприятия</h2>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <select id="filterEvents" style="padding: 0.75rem; border: 2px solid #bdc3c7; border-radius: 8px;">
+                            <option value="">Все мероприятия</option>
+                            <option value="upcoming">Предстоящие</option>
+                            <option value="past">Завершенные</option>
+                        </select>
+                        <button class="btn btn-info" onclick="admin.exportEvents()">📤 Экспорт CSV</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <div id="allEvents">
+                        <div class="loading">Загрузка мероприятий...</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Новое мероприятие -->
+            <section id="newEvent" class="section">
+                <h2>➕ Создать новое мероприятие</h2>
+                <div class="table-container" style="padding: 2rem;">
+                    <form id="createEventForm">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                            <div class="form-group">
+                                <label for="eventName">Название мероприятия *</label>
+                                <input type="text" id="eventName" required placeholder="Введите название мероприятия">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="eventDate">Дата и время *</label>
+                                <input type="datetime-local" id="eventDate" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="eventVenue">Площадка *</label>
+                                <input type="text" id="eventVenue" required placeholder="Укажите место проведения">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="eventDuration">Продолжительность (минуты)</label>
+                                <input type="number" id="eventDuration" value="120" min="30" max="480">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="eventDescription">Описание мероприятия</label>
+                            <textarea id="eventDescription" rows="4" placeholder="Опишите мероприятие..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventImage">Название файла изображения</label>
+                            <input type="text" id="eventImage" placeholder="concert.jpg">
+                            <small style="color: #666;">Файл должен находиться в папке /public/images/</small>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success">🎭 Создать мероприятие</button>
+                    </form>
+                </div>
+            </section>
+            
+            <!-- Управление местами -->
+            <section id="seatsManagement" class="section">
+                <h2>💺 Управление местами</h2>
+                
+                <div class="table-container" style="margin-bottom: 2rem; padding: 1.5rem;">
+                    <div class="form-group">
+                        <label for="eventSelect">Выберите мероприятие:</label>
+                        <select id="eventSelect">
+                            <option value="">-- Выберите мероприятие --</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Форма массового создания мест -->
+                <div class="table-container" style="margin-bottom: 2rem; padding: 1.5rem;">
+                    <h3 style="margin-bottom: 1.5rem; color: #2c3e50;">🎪 Создать схему зала</h3>
+                    <form id="createSeatsForm">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                            <div class="form-group">
+                                <label for="rowsCount">Количество рядов *</label>
+                                <input type="number" id="rowsCount" min="1" max="20" value="6" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="seatsPerRow">Мест в ряду *</label>
+                                <input type="number" id="seatsPerRow" min="1" max="20" value="8" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="basePrice">Базовая цена (₽) *</label>
+                                <input type="number" id="basePrice" min="100" value="1500" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="vipRows">VIP ряды (через запятую)</label>
+                                <input type="text" id="vipRows" placeholder="0,1" value="0,1">
+                                <small style="color: #7f8c8d; font-size: 0.85rem;">Нумерация с 0 (A=0, B=1, C=2...)</small>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success" style="margin-top: 1rem;">
+                            🎪 Создать схему зала
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Схема зала -->
+                <div id="seatsContainer">
+                    <div class="loading">Выберите мероприятие для управления местами</div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script>
+        // Функция проверки пароля
+        function checkAdminPassword() {
+            const password = document.getElementById('adminPassword').value;
+            const errorElement = document.getElementById('loginError');
+            
+            if (password === 'Жопа') {
+                // Пароль верный - показываем админ-панель
+                document.getElementById('adminLogin').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                // Инициализируем админ-панель
+                if (window.admin) {
+                    window.admin.init();
+                }
+            } else {
+                // Пароль неверный - показываем ошибку
+                errorElement.style.display = 'block';
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('adminPassword').focus();
+            }
+        }
+
+        // Выход из админ-панели
+        function logoutAdmin() {
+            if (confirm('Вы уверены, что хотите выйти?')) {
+                document.getElementById('adminLogin').style.display = 'flex';
+                document.getElementById('adminContent').style.display = 'none';
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('loginError').style.display = 'none';
+            }
+        }
+
+        // Обработка нажатия Enter в поле пароля
+        document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAdminPassword();
+            }
+        });
+
+        // Фокусируемся на поле пароля при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('adminPassword').focus();
+        });
+        // Функция для открытия страницы проверки билетов
+        function openTicketChecker() {
+            window.open('/verify.html', '_blank');
+        }
+    </script>
+    <script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,978 @@
+/* Сброс стандартных отступов и настроек браузера */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Основные стили страницы */
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f4f4f4;
+}
+
+/* Шапка сайта */
+.header {
+    background: #2c3e50;
+    color: white;
+    padding: 1rem 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.logo h1 {
+    font-size: 1.5rem;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: #3498db;
+}
+
+/* Главный баннер */
+.hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-top: 60px; /* Учитываем высоту фиксированной шапки */
+}
+
+.hero-content h2 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.cta-button {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.cta-button:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+}
+
+/* Секция мероприятий */
+.events-section {
+    padding: 4rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.events-section h2 {
+    text-align: center;
+    margin-bottom: 3rem;
+    font-size: 2.5rem;
+    color: #2c3e50;
+}
+
+.events-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+/* Карточка мероприятия (будет заполняться через JS) */
+.event-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.event-image {
+    width: 100%;
+    height: 200px;
+    background: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+}
+
+.event-info {
+    padding: 1.5rem;
+}
+
+.event-info h3 {
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+.event-date {
+    color: #e74c3c;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.book-button {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.3s ease;
+}
+
+.book-button:hover {
+    background: #2980b9;
+}
+
+/* Секция "О зале" */
+.about-section {
+    background: white;
+    padding: 4rem 2rem;
+    margin: 2rem auto;
+    max-width: 1200px;
+}
+
+.about-section h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #2c3e50;
+}
+
+.about-content {
+    display: flex;
+    gap: 3rem;
+    align-items: center;
+}
+
+.about-text {
+    flex: 1;
+}
+
+.about-text ul {
+    margin-top: 1rem;
+    list-style-position: inside;
+}
+
+.about-text li {
+    margin-bottom: 0.5rem;
+}
+
+/* Подвал */
+.footer {
+    background: #2c3e50;
+    color: white;
+    text-align: center;
+    padding: 2rem;
+    margin-top: 4rem;
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 2rem;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #aaa;
+}
+
+.close:hover {
+    color: #333;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .nav {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .hero-content h2 {
+        font-size: 2rem;
+    }
+    
+    .about-content {
+        flex-direction: column;
+    }
+    
+    .events-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+    color: #666;
+}
+/* Улучшенные стили карточек мероприятий */
+.event-card {
+    position: relative;
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.event-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3498db, #e74c3c);
+}
+
+.event-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.event-image {
+    position: relative;
+    height: 200px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    overflow: hidden;
+}
+
+.event-image::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.3);
+}
+
+.event-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #e74c3c;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    z-index: 2;
+}
+
+/* Система рейтинга */
+.rating {
+    display: flex;
+    gap: 2px;
+    margin: 10px 0;
+}
+
+.star {
+    color: #f39c12;
+    font-size: 1.1rem;
+}
+
+.star.empty {
+    color: #ddd;
+}
+
+/* Цена билета */
+.event-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #27ae60;
+    margin: 10px 0;
+}
+
+.price-label {
+    font-size: 0.9rem;
+    color: #666;
+}
+/* Стили для форм */
+.booking-form {
+    max-width: 100%;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.form-group input.error {
+    border-color: #e74c3c;
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+/* Кнопки форм */
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+.btn-primary {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: #2980b9;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #95a5a6;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: #7f8c8d;
+}
+
+/* Стили успешного бронирования */
+.booking-success {
+    text-align: center;
+}
+
+.booking-details {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+    text-align: left;
+}
+
+.booking-details p {
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.booking-details p:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.success-actions {
+    margin-top: 1.5rem;
+}
+/* Стили для схемы зала */
+.seat-selection {
+    margin: 2rem 0;
+}
+
+.seat-map {
+    background: #2c3e50;
+    border-radius: 15px;
+    padding: 2rem;
+    margin: 1rem 0;
+    position: relative;
+}
+
+.stage {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    margin-bottom: 3rem;
+    border-radius: 10px;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.seats-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+}
+
+.seat-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.row-label {
+    color: white;
+    font-weight: bold;
+    min-width: 30px;
+    text-align: center;
+}
+
+.seat {
+    width: 35px;
+    height: 35px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.8rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Состояния мест */
+.seat-free {
+    background: #27ae60;
+    color: white;
+}
+
+.seat-free:hover {
+    background: #2ecc71;
+    transform: scale(1.1);
+}
+
+.seat-selected {
+    background: #3498db;
+    color: white;
+    transform: scale(1.1);
+}
+
+.seat-occupied {
+    background: #7f8c8d;
+    color: white;
+    cursor: not-allowed;
+}
+
+.seat-vip {
+    background: linear-gradient(135deg, #f39c12, #e74c3c);
+    color: white;
+}
+
+.seat-vip.seat-free:hover {
+    background: linear-gradient(135deg, #f1c40f, #e67e22);
+}
+
+/* Легенда мест */
+.seat-legend {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+}
+
+/* Информация о выборе */
+.selection-info {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-top: 1rem;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.selected-seats-list {
+    margin: 1rem 0;
+}
+
+.selected-seat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.seat-total {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2c3e50;
+    text-align: right;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid #3498db;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .seat-map {
+        padding: 1rem;
+    }
+    
+    .seat {
+        width: 30px;
+        height: 30px;
+        font-size: 0.7rem;
+    }
+    
+    .seat-legend {
+        gap: 1rem;
+    }
+    
+    .legend-item {
+        font-size: 0.8rem;
+    }
+}
+/* Стили для шагов бронирования */
+.booking-steps {
+    display: flex;
+    justify-content: space-between;
+    margin: 2rem 0;
+    position: relative;
+}
+
+.booking-steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #ddd;
+    z-index: 1;
+}
+
+.step {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    background: white;
+    border-radius: 20px;
+    position: relative;
+    z-index: 2;
+    font-weight: bold;
+    color: #7f8c8d;
+    border: 2px solid #ddd;
+    transition: all 0.3s ease;
+}
+
+.step.active {
+    background: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+
+.booking-step {
+    display: none;
+}
+
+.booking-step.active {
+    display: block;
+}
+
+/* Стили для подтверждения */
+.confirmation-section {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.confirmation-section h6 {
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+.confirmation-total {
+    background: #2c3e50;
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    text-align: center;
+}
+
+.confirmation-notice {
+    text-align: center;
+    color: #7f8c8d;
+    font-style: italic;
+}
+/* Улучшенные стили для мест с анимациями */
+.seat {
+    width: 35px;
+    height: 35px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.8rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.seat::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+}
+
+.seat:hover::after {
+    left: 100%;
+}
+
+/* Явные состояния для лучшей видимости */
+.seat-free {
+    background: #27ae60;
+    color: white;
+    border: 2px solid #27ae60;
+}
+
+.seat-free:hover {
+    background: #2ecc71;
+    border-color: #2ecc71;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+}
+
+.seat-selected {
+    background: #3498db !important;
+    color: white !important;
+    border: 2px solid #3498db !important;
+    transform: scale(1.15);
+    box-shadow: 0 6px 16px rgba(52, 152, 219, 0.5);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 6px 16px rgba(52, 152, 219, 0.5); }
+    50% { box-shadow: 0 6px 24px rgba(52, 152, 219, 0.8); }
+    100% { box-shadow: 0 6px 16px rgba(52, 152, 219, 0.5); }
+}
+
+.seat-occupied {
+    background: #7f8c8d !important;
+    color: white !important;
+    border: 2px solid #7f8c8d !important;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+}
+
+.seat-vip.seat-free {
+    background: linear-gradient(135deg, #f39c12, #e74c3c);
+    color: white;
+    border: 2px solid #f39c12;
+}
+
+.seat-vip.seat-free:hover {
+    background: linear-gradient(135deg, #f1c40f, #e67e22);
+    border-color: #f1c40f;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.4);
+}
+
+/* Улучшаем кнопку Далее */
+.btn-primary:disabled {
+    background: #bdc3c7 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+.btn-primary:not(:disabled):hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+}
+/* Исправляем модальное окно */
+.modal-content {
+    background-color: white;
+    margin: 2% auto;
+    padding: 2rem;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh; /* Ограничиваем высоту */
+    overflow-y: auto; /* Добавляем прокрутку */
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* Уменьшаем отступы для компактности */
+.seat-map {
+    background: #2c3e50;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    max-height: 400px; /* Ограничиваем высоту карты */
+    overflow-y: auto; /* Прокрутка если не помещается */
+}
+
+/* Делаем кнопку "Далее" всегда видимой */
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 2px solid #eee;
+    position: sticky;
+    bottom: 0;
+    background: white;
+    z-index: 10;
+}
+
+/* Уменьшаем размеры мест для компактности */
+.seat {
+    width: 30px;
+    height: 30px;
+    font-size: 0.7rem;
+}
+
+/* Компактная легенда */
+.seat-legend {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+}
+
+/* Уменьшаем отступы в информации о выборе */
+.selection-info {
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-top: 1rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Адаптивность для маленьких экранов */
+@media (max-width: 768px) {
+    .modal-content {
+        margin: 5% auto;
+        padding: 1rem;
+        width: 95%;
+    }
+    
+    .seat-map {
+        padding: 1rem;
+        max-height: 300px;
+    }
+    
+    .form-actions {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 1rem;
+        border-top: 1px solid #ddd;
+        margin: 0;
+    }
+}
+/* Стили для уведомлений */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    color: white;
+    z-index: 10000;
+    max-width: 300px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: slideIn 0.3s ease;
+}
+
+.notification-success { background: #27ae60; }
+.notification-error { background: #e74c3c; }
+.notification-info { background: #3498db; }
+
+.notification-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+/* Стиль для кнопки "Подробнее" */
+.details-button {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.details-button:hover {
+    background: #2980b9;
+}
+/* Стили для иконок правил на билете */
+.rules-icons {
+    display: flex;
+    gap: 0.8rem;
+}
+
+.rule-icon {
+    width: 24px;
+    height: 24px;
+    background-image: url('/images/icons.png');
+    background-size: 96px 24px; /* 4 иконки по 24px */
+    background-repeat: no-repeat;
+}
+
+.rule-icon.no-food {
+    background-position: 0 0;
+}
+
+.rule-icon.no-weapons {
+    background-position: -24px 0;
+}
+
+.rule-icon.no-smoking {
+    background-position: -48px 0;
+}
+
+.rule-icon.photo-allowed {
+    background-position: -72px 0;
+}

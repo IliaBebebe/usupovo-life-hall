@@ -1,0 +1,11 @@
+{
+  "name": "usupovo-life-hall",
+  "version": "1.0.0", 
+  "scripts": {
+    "start": "node server/server.js",
+    "postinstall": "cd server && npm install"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}

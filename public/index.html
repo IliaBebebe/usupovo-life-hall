@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usupovo Life Hall - Концертный зал</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+</head>
+<body>
+    <!-- Шапка сайта -->
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <h1>Usupovo Life Hall</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#events">Мероприятия</a></li>
+                <li><a href="#about">О зале</a></li>
+                <li><a href="#contacts">Контакты</a></li>
+                <li><a href="admin.html">Админ-панель</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Главный баннер -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Добро пожаловать на сайт Usupovo Life Hall</h2>
+            <p>Лучшие мероприятия только здесь</p>
+            <button class="cta-button" onclick="scrollToEvents()">Смотреть мероприятия</button>
+        </div>
+    </section>
+
+    <!-- Секция мероприятий -->
+    <section id="events" class="events-section">
+        <h2>Ближайшие мероприятия</h2>
+        <div class="events-container" id="eventsContainer">
+            <!-- Сюда JavaScript будет добавлять мероприятия -->
+            <div class="loading">Загрузка мероприятий...</div>
+        </div>
+    </section>
+
+    <!-- Секция о зале -->
+    <section id="about" class="about-section">
+        <h2>О нашем зале</h2>
+        <div class="about-content">
+            <div class="about-text">
+                <p>Usupovo Life Hall - это современный концертный зал с богатой историей и передовым оборудованием.</p>
+                <ul>
+                    <li>Вместимость: 8 человек</li>
+                    <li>Премиальное звуковое оборудование</li>
+                    <li>Удобная система бронирования</li>
+                    <li>Профессиональная команда</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Подвал -->
+    <footer id="contacts" class="footer">
+        <div class="footer-content">
+            <h3>Контакты</h3>
+            <p>📞 +7 (985) 834-94-94</p>
+            <p>📧 rex.corp@yandex.ru</p>
+            <p>📍 г.о. Домодедово, КП "Юсупово Лайф Парк", ул. Рассветная, 8</p>
+        </div>
+    </footer>
+
+    <!-- Модальное окно для бронирования (пока скрыто) -->
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Бронирование билетов</h3>
+            <div id="modalBody">
+                <!-- Сюда будет подгружаться форма бронирования -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

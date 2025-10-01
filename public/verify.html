@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проверка билетов - Usupovo Life Hall</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: #f4f4f4; 
+        }
+        .container { 
+            max-width: 400px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 2rem; 
+            border-radius: 15px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+        }
+        .scanner { 
+            text-align: center; 
+            margin: 2rem 0; 
+        }
+        #reader { 
+            width: 100%; 
+            height: 300px; 
+            border: 2px dashed #3498db; 
+            border-radius: 10px; 
+            margin: 1rem 0; 
+        }
+        .ticket-info { 
+            background: #e8f4fd; 
+            padding: 1rem; 
+            border-radius: 8px; 
+            margin: 1rem 0; 
+            display: none; 
+        }
+        .valid { border-left: 4px solid #27ae60; }
+        .invalid { border-left: 4px solid #e74c3c; }
+        button { 
+            background: #3498db; 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 1rem; 
+            margin: 5px 0;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+        .button-group button {
+            flex: 1;
+        }
+        .camera-error {
+            color: #e74c3c;
+            text-align: center;
+            padding: 1rem;
+            background: #fdf2f2;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .manual-input {
+            text-align: center;
+            margin: 1rem 0;
+        }
+        .manual-input input {
+            padding: 10px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            width: 100%;
+            margin: 10px 0;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 style="text-align: center;">🔍 Проверка билетов</h2>
+        
+        <div class="scanner">
+            <p>Наведите камеру на QR-код билета</p>
+            <div id="reader">
+                <button id="startScanner" onclick="startQRScanner()" style="margin-top: 1rem;">
+                    📷 Запустить сканер QR-кодов
+                </button>
+                <button id="stopScanner" onclick="stopQRScanner()" style="display: none; background: #e74c3c; margin-top: 1rem;">
+                    ⏹️ Остановить сканер
+                </button>
+            </div>
+            <div id="cameraError" class="camera-error" style="display: none;"></div>
+        </div>
+
+        <div class="manual-input">
+            <h3>📝 Ручной ввод</h3>
+            <input type="text" id="manualTicketInput" placeholder="Введите номер билета (например: B1759239313969)">
+            <button onclick="checkManualTicket()">🔍 Проверить билет</button>
+        </div>
+        
+        <div id="ticketInfo" class="ticket-info">
+            <!-- Сюда будет загружаться информация о билете -->
+        </div>
+        
+        <div class="button-group">
+            <button onclick="clearResults()">🗑️ Очистить</button>
+        </div>
+    </div>
+
+    <script src="verify.js"></script>
+</body>
+</html>
