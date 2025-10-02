@@ -1113,7 +1113,45 @@ function showSection(sectionId) {
         }
     }
 }
+function showStats() {
+    const statsSection = document.getElementById('statsSection');
+    statsSection.style.display = statsSection.style.display === 'none' ? 'block' : 'none';
+    
+    if (statsSection.style.display === 'block') {
+        loadStats();
+    }
+}
 
+function loadStats() {
+    fetch('/api/admin/stats')
+        .then(response => response.json())
+        .then(stats => {
+            document.getElementById('statsContent').innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h4>📈 Общая статистика</h4>
+                        <p><strong>Всего посещений:</strong> ${stats.totalVisits}</p>
+                        
+                        <h4>🌐 Посещения по страницам</h4>
+                        ${stats.pageStats.map(page => `
+                            <p>${page.page}: ${page.count} посещений</p>
+                        `).join('')}
+                    </div>
+                    
+                    <div>
+                        <h4>🕒 Последние посещения</h4>
+                        ${stats.recentVisits.map(visit => `
+                            <p>${new Date(visit.visit_time).toLocaleString('ru-RU')} - ${visit.page}</p>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        })
+        .catch(error => {
+            console.error('Error loading stats:', error);
+            document.getElementById('statsContent').innerHTML = '<p>Ошибка загрузки статистики</p>';
+        });
+}
 function toggleTheme() {
     document.body.classList.toggle('dark-theme');
     const isDark = document.body.classList.contains('dark-theme');

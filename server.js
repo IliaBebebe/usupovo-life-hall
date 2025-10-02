@@ -67,10 +67,16 @@ function initializeDatabase() {
             total_amount INTEGER NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             expires_at DATETIME NOT NULL
+        )`,
+
+        `CREATE TABLE IF NOT EXISTS site_stats (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            page TEXT NOT NULL,
+            visit_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+            user_agent TEXT
         )`
     ];
 
-    // Выполняем создание таблиц последовательно
     let currentIndex = 0;
     
     function createNextTable() {
@@ -191,7 +197,62 @@ app.get('/api/events', (req, res) => {
         res.json(rows);
     });
 });
-
+// Middleware для трекинга посещений
+app.use((req, res, next) => {
+    // Трекаем только основные страницы, не API и не статику
+    if (req.path === '/' || req.path === '/verify.html' || req.path === '/admin') {
+        db.run(
+            'INSERT INTO site_stats (page, user_agent) VALUES (?, ?)',
+            [req.path, req.get('User-Agent')],
+            (err) => {
+                if (err) console.error('Stats tracking error:', err);
+            }
+        );
+    }
+    next();
+});
+// API для получения статистики
+app.get('/api/admin/stats', (req, res) => {
+    // Общее количество посещений
+    db.get('SELECT COUNT(*) as total FROM site_stats', (err, totalRow) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        
+        // Посещения по страницам
+        db.all(`
+            SELECT page, COUNT(*) as count 
+            FROM site_stats 
+            GROUP BY page 
+            ORDER BY count DESC
+        `, (err, pageStats) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            
+            // Последние 10 посещений
+            db.all(`
+                SELECT page, visit_time 
+                FROM site_stats 
+                ORDER BY visit_time DESC 
+                LIMIT 10
+            `, (err, recentVisits) => {
+                if (err) {
+                    res.status(500).json({ error: err.message });
+                    return;
+                }
+                
+                res.json({
+                    totalVisits: totalRow.total,
+                    pageStats: pageStats,
+                    recentVisits: recentVisits
+                });
+            });
+        });
+    });
+});
 app.get('/api/seats/event/:eventId', (req, res) => {
     const eventId = req.params.eventId;
     db.all(
@@ -289,9 +350,6 @@ app.get('/', (req, res) => {
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/admin.html'));
 });
-// Добавить в server.js после существующих роутов:
-
-// API для проверки билета по ID
 // API для проверки билета по ID
 app.get('/api/ticket/:ticketId', (req, res) => {
     const ticketId = req.params.ticketId;
