@@ -2,21 +2,21 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
+const dbPath = process.env.DATABASE_URL || './usupovo-hall.db';
 
 const app = express();
 const PORT = 3000;
-
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // База данных
-const db = new sqlite3.Database('./usupovo-hall.db', (err) => {
+const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error('❌ Error opening database', err);
     } else {
-        console.log('✅ Connected to SQLite database');
+        console.log('✅ Connected to SQLite database:', dbPath);
         initializeDatabase();
     }
 });
@@ -105,11 +105,12 @@ function checkAndInsertSampleData() {
             return;
         }
         
+        // Добавляем тестовые данные ТОЛЬКО если таблица пустая
         if (row.count === 0) {
-            console.log('📝 Inserting sample data...');
+            console.log('📝 Inserting sample data for first run...');
             insertSampleData();
         } else {
-            console.log('✅ Sample data already exists');
+            console.log('✅ Database already has data, skipping sample data');
         }
     });
 }
