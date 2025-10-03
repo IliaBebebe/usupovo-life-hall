@@ -1,7 +1,7 @@
 {
   "name": "usupovo-life-hall",
   "version": "1.0.0",
-  "description": "Usupovo Life Hall - Ticket Booking and Verification System",
+  "description": "Usupovo Life Hall - Ticket Booking & Verification System",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -10,10 +10,12 @@
   "keywords": [
     "tickets",
     "booking",
-    "qr-scanner",
-    "event-management"
+    "event-management",
+    "concert",
+    "life hall",
+    "usupovo life hall"
   ],
-  "author": "IliaBebebe",
+  "author": "REX Corporation",
   "license": "MIT",
   "dependencies": {
     "cors": "^2.8.5",
