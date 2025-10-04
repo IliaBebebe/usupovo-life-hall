@@ -6,12 +6,9 @@ const dbPath = process.env.DATABASE_URL || './usupovo-hall.db';
 
 const app = express();
 const PORT = 3000;
-// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
-
-// База данных
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error('❌ Error opening database', err);
@@ -21,11 +18,8 @@ const db = new sqlite3.Database(dbPath, (err) => {
     }
 });
 
-// Правильная инициализация БД
 function initializeDatabase() {
     console.log('🔄 Initializing database...');
-    
-    // Создаем таблицы последовательно
     const tables = [
         `CREATE TABLE IF NOT EXISTS events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -101,17 +95,12 @@ function initializeDatabase() {
     
     createNextTable();
 }
-
-// Проверяем и вставляем тестовые данные
 function checkAndInsertSampleData() {
-    // Проверяем есть ли мероприятия
     db.get("SELECT COUNT(*) as count FROM events", (err, row) => {
         if (err) {
             console.error('Error checking events:', err);
             return;
         }
-        
-        // Добавляем тестовые данные ТОЛЬКО если таблица пустая
         if (row.count === 0) {
             console.log('📝 Inserting sample data for first run...');
             insertSampleData();
@@ -120,8 +109,6 @@ function checkAndInsertSampleData() {
         }
     });
 }
-
-// Вставка тестовых данных
 function insertSampleData() {
     const events = [
         ['Джазовый вечер с Ансамблем "Ностальжи"', '2024-12-15 19:00:00', 'Незабываемый вечер классического джаза', 'jazz.jpg'],
@@ -141,12 +128,8 @@ function insertSampleData() {
                 } else {
                     eventsInserted++;
                     console.log(`✅ Event created with ID: ${this.lastID}`);
-                    
-                    // Создаем места для этого мероприятия
                     createSeatsForEvent(this.lastID);
                 }
-                
-                // Когда все события вставлены
                 if (eventsInserted === events.length) {
                     console.log('✅ All sample data inserted');
                 }
@@ -154,14 +137,12 @@ function insertSampleData() {
         );
     });
 }
-
-// Создание мест для мероприятия
 function createSeatsForEvent(eventId) {
     console.log(`🔄 Creating seats for event ${eventId}...`);
     
     const rows = ['A', 'B', 'C', 'D'];
     let seatsCreated = 0;
-    const totalSeats = rows.length * 6; // 4 ряда по 6 мест
+    const totalSeats = rows.length * 6;
     
     rows.forEach(row => {
         for (let i = 1; i <= 6; i++) {
@@ -187,7 +168,7 @@ function createSeatsForEvent(eventId) {
         }
     });
 }
-// API Routes
+//======= API Routes ========
 app.get('/api/events', (req, res) => {
     db.all('SELECT * FROM events ORDER BY date', (err, rows) => {
         if (err) {
@@ -197,9 +178,7 @@ app.get('/api/events', (req, res) => {
         res.json(rows);
     });
 });
-// Middleware для трекинга посещений
 app.use((req, res, next) => {
-    // Трекаем только основные страницы, не API и не статику
     if (req.path === '/' || req.path === '/verify.html' || req.path === '/admin') {
         db.run(
             'INSERT INTO site_stats (page, user_agent) VALUES (?, ?)',
@@ -211,16 +190,12 @@ app.use((req, res, next) => {
     }
     next();
 });
-// API для получения статистики
 app.get('/api/admin/stats', (req, res) => {
-    // Общее количество посещений
     db.get('SELECT COUNT(*) as total FROM site_stats', (err, totalRow) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
-        
-        // Посещения по страницам
         db.all(`
             SELECT page, COUNT(*) as count 
             FROM site_stats 
@@ -231,8 +206,6 @@ app.get('/api/admin/stats', (req, res) => {
                 res.status(500).json({ error: err.message });
                 return;
             }
-            
-            // Последние 10 посещений
             db.all(`
                 SELECT page, visit_time 
                 FROM site_stats 
@@ -274,8 +247,6 @@ app.post('/api/book', (req, res) => {
     if (!seats || seats.length === 0) {
         return res.status(400).json({ error: 'No seats selected' });
     }
-    
-    // Рассчитываем общую стоимость
     const placeholders = seats.map(() => '?').join(',');
     db.all(
         `SELECT SUM(price) as total FROM seats WHERE seat_label IN (${placeholders})`,
@@ -288,8 +259,6 @@ app.post('/api/book', (req, res) => {
             
             const total = result[0].total;
             const bookingId = 'B' + Date.now();
-            
-            // Создаем билет
             db.run(
                 `INSERT INTO tickets (id, event_id, seat_labels, customer_name, customer_email, customer_phone, total_amount, booking_time) 
                  VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
@@ -299,8 +268,6 @@ app.post('/api/book', (req, res) => {
                         res.status(500).json({ error: err.message });
                         return;
                     }
-                    
-                    // Помечаем места как занятые
                     seats.forEach(seat => {
                         db.run(
                             'UPDATE seats SET status = "occupied" WHERE seat_label = ? AND event_id = ?',
@@ -319,7 +286,6 @@ app.post('/api/book', (req, res) => {
         }
     );
 });
-// Получить одно мероприятие по ID
 app.get('/api/events/:eventId', (req, res) => {
     const eventId = req.params.eventId;
     
@@ -342,7 +308,7 @@ app.get('/api/events/:eventId', (req, res) => {
         res.json(row);
     });
 });
-// Serve frontend
+// ====== Serve frontend ========
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
@@ -350,7 +316,6 @@ app.get('/', (req, res) => {
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/admin.html'));
 });
-// API для проверки билета по ID
 app.get('/api/ticket/:ticketId', (req, res) => {
     const ticketId = req.params.ticketId;
     
@@ -389,19 +354,15 @@ app.get('/api/ticket/:ticketId', (req, res) => {
                 seats: ticket.seat_labels,
                 total: ticket.total_amount,
                 bookingTime: ticket.booking_time,
-                status: ticket.status // ВАЖНО: возвращаем статус!
+                status: ticket.status
             }
         });
     });
 });
-
-// API для отметки билета как использованного - ИСПРАВЛЕННАЯ ВЕРСИЯ
 app.post('/api/ticket/:ticketId/use', (req, res) => {
     const ticketId = req.params.ticketId;
     
     console.log('🔄 Отмечаем билет как использованный:', ticketId);
-    
-    // 1. Сначала обновляем статус
     db.run(
         'UPDATE tickets SET status = "used" WHERE id = ?',
         [ticketId],
@@ -418,8 +379,6 @@ app.post('/api/ticket/:ticketId/use', (req, res) => {
             }
             
             console.log('✅ Билет отмечен как использованный, изменений:', this.changes);
-            
-            // 2. Затем получаем ОБНОВЛЕННЫЕ данные билета
             db.get(`
                 SELECT t.*, e.name as event_name, e.date as event_date 
                 FROM tickets t 
@@ -438,8 +397,6 @@ app.post('/api/ticket/:ticketId/use', (req, res) => {
                 }
                 
                 console.log('📋 Обновленный статус билета:', ticket.status);
-                
-                // 3. Возвращаем обновленные данные
                 res.json({
                     success: true,
                     ticket: {
@@ -450,7 +407,7 @@ app.post('/api/ticket/:ticketId/use', (req, res) => {
                         seats: ticket.seat_labels,
                         total: ticket.total_amount,
                         bookingTime: ticket.booking_time,
-                        status: ticket.status // ВАЖНО: возвращаем статус!
+                        status: ticket.status
                     },
                     message: 'Билет отмечен как использованный'
                 });
@@ -461,9 +418,7 @@ app.post('/api/ticket/:ticketId/use', (req, res) => {
 app.get('/verify.html', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/verify.html'));
 });
-// ==================== АДМИН РОУТЫ ====================
-
-// Получить все бронирования для админки
+// ==================== АДМИНСКИЕ РОУТЫ ====================
 app.get('/api/admin/bookings', (req, res) => {
     db.all(`
         SELECT t.*, e.name as event_name, e.date as event_date 
@@ -478,8 +433,6 @@ app.get('/api/admin/bookings', (req, res) => {
         res.json(rows);
     });
 });
-
-// Получить все мероприятия для админки
 app.get('/api/admin/events', (req, res) => {
     db.all(`
         SELECT e.*, 
@@ -495,8 +448,6 @@ app.get('/api/admin/events', (req, res) => {
         res.json(rows);
     });
 });
-
-// Создать новое мероприятие
 app.post('/api/admin/events', (req, res) => {
     const { name, date, description, image_url, venue, duration } = req.body;
     
@@ -505,15 +456,11 @@ app.post('/api/admin/events', (req, res) => {
     if (!name || !date) {
         return res.status(400).json({ error: 'Название и дата обязательны' });
     }
-    
-    // ОБРАБОТКА ИЗОБРАЖЕНИЯ: добавляем путь если нужно
     let finalImageUrl = image_url;
     if (image_url && image_url !== 'default.jpg') {
-        // Если указано просто имя файла, добавляем путь
         if (!image_url.includes('/')) {
-            finalImageUrl = image_url; // Просто имя файла
+            finalImageUrl = image_url;
         }
-        // Если указан полный путь, оставляем как есть (для обратной совместимости)
     } else {
         finalImageUrl = 'default.jpg';
     }
@@ -530,8 +477,6 @@ app.post('/api/admin/events', (req, res) => {
             
             const eventId = this.lastID;
             console.log('✅ Мероприятие создано с ID:', eventId);
-            
-            // Автоматически создаем места для нового мероприятия
             createSeatsForEvent(eventId);
             
             res.json({ 
@@ -567,8 +512,6 @@ app.post('/api/admin/events', (req, res) => {
         console.log('✅ Места созданы для мероприятия', eventId);
     }
 });
-
-// Удалить мероприятие
 app.delete('/api/admin/events/:eventId', (req, res) => {
     const eventId = req.params.eventId;
     
@@ -585,8 +528,6 @@ app.delete('/api/admin/events/:eventId', (req, res) => {
             res.status(404).json({ error: 'Мероприятие не найдено' });
             return;
         }
-        
-        // Также удаляем связанные места
         db.run('DELETE FROM seats WHERE event_id = ?', [eventId]);
         
         console.log('✅ Мероприятие удалено:', eventId);
@@ -596,8 +537,6 @@ app.delete('/api/admin/events/:eventId', (req, res) => {
         });
     });
 });
-
-// Статистика для дашборда
 app.get('/api/admin/stats', (req, res) => {
     db.all(`
         SELECT 
@@ -614,16 +553,15 @@ app.get('/api/admin/stats', (req, res) => {
         res.json(rows[0]);
     });
 });
-// Serve admin page
+// ======= Serve admin page =======
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/admin.html'));
 });
 
-// Serve admin.js
+// ============= Serve admin.js ===========
 app.get('/admin.js', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/admin.js'));
 });
-// Управление местами мероприятия
 app.get('/api/admin/events/:eventId/seats', (req, res) => {
     const eventId = req.params.eventId;
     
@@ -639,7 +577,6 @@ app.get('/api/admin/events/:eventId/seats', (req, res) => {
         res.json(rows);
     });
 });
-// Обновить место
 app.put('/api/admin/seats/:seatId', (req, res) => {
     const seatId = req.params.seatId;
     const { price, category, status } = req.body;
@@ -665,16 +602,14 @@ app.put('/api/admin/seats/:seatId', (req, res) => {
         }
     );
 });
-// Создание заказа для оплаты
 // ==================== ПЛАТЕЖНЫЕ РОУТЫ ====================
-// Создание заказа для оплаты - С ОТЛАДКОЙ
 app.post('/api/create-payment', (req, res) => {
     const { eventId, seats, customer, total } = req.body;
     
     console.log('💰 Создаем платеж для:', { 
         eventId, 
         seats, 
-        customer: customer, // ВАЖНО: выводим объект customer
+        customer: customer,
         total 
     });
     
@@ -685,17 +620,13 @@ app.post('/api/create-payment', (req, res) => {
     const bookingId = 'B' + Date.now();
     const paymentId = 'P' + Date.now();
     
-    // Рассчитываем время истечения (30 минут)
+    // через 30 мин недействительно
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString();
-
-    // Проверяем что customer содержит нужные поля
     console.log('👤 Данные покупателя:', {
         name: customer.name,
         email: customer.email, 
         phone: customer.phone
     });
-
-    // Сохраняем в БД
     db.run(
         `INSERT INTO pending_bookings 
          (payment_id, booking_id, event_id, seat_labels, customer_name, customer_email, customer_phone, total_amount, expires_at) 
@@ -731,14 +662,9 @@ app.post('/api/create-payment', (req, res) => {
         }
     );
 });
-
-// Подтверждение оплаты - С ОТЛАДКОЙ
 app.post('/api/confirm-payment', (req, res) => {
     const { paymentId } = req.body;
-    
     console.log('🔄 Подтверждаем оплату:', paymentId);
-    
-    // Проверяем существование и не истекло ли время
     db.get(
         `SELECT * FROM pending_bookings 
          WHERE payment_id = ? AND datetime(expires_at) > datetime('now')`,
@@ -758,8 +684,6 @@ app.post('/api/confirm-payment', (req, res) => {
             console.log('📋 Данные из pending_bookings:', pendingBooking);
             
             const { booking_id, event_id, seat_labels, customer_name, customer_email, customer_phone, total_amount } = pendingBooking;
-
-            // Создаем постоянное бронирование
             db.run(
                 `INSERT INTO tickets (id, event_id, seat_labels, customer_name, customer_email, customer_phone, total_amount, booking_time, status) 
                  VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), 'active')`,
@@ -770,8 +694,6 @@ app.post('/api/confirm-payment', (req, res) => {
                         res.status(500).json({ error: err.message });
                         return;
                     }
-                    
-                    // Помечаем места как занятые
                     const seats = seat_labels.split(',');
                     seats.forEach(seat => {
                         db.run(
@@ -779,8 +701,6 @@ app.post('/api/confirm-payment', (req, res) => {
                             [seat, event_id]
                         );
                     });
-
-                    // Удаляем из pending_bookings
                     db.run('DELETE FROM pending_bookings WHERE payment_id = ?', [paymentId]);
                     
                     console.log('✅ Бронирование подтверждено:', booking_id);
@@ -797,19 +717,14 @@ app.post('/api/confirm-payment', (req, res) => {
         }
     );
 });
-// Массовое создание мест
 app.post('/api/admin/events/:eventId/seats/bulk', (req, res) => {
     const eventId = req.params.eventId;
     const { rows, seatsPerRow, basePrice, vipRows } = req.body;
-    
-    // Удаляем существующие места
     db.run('DELETE FROM seats WHERE event_id = ?', [eventId], function(err) {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
-        
-        // Создаем новые места
         let seatsCreated = 0;
         const rowLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
         
@@ -834,8 +749,6 @@ app.post('/api/admin/events/:eventId/seats/bulk', (req, res) => {
                 );
             }
         }
-        
-        // Ждем немного чтобы все места успели создатьсь
         setTimeout(() => {
             res.json({ 
                 success: true, 
@@ -845,7 +758,7 @@ app.post('/api/admin/events/:eventId/seats/bulk', (req, res) => {
         }, 500);
     });
 });
-// Запуск сервера
+// запуск всего этого говна
 app.listen(PORT, () => {
     console.log('🎭 Usupovo Life Hall Server running!');
     console.log(`📍 Локально: http://localhost:${PORT}`);

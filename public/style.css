@@ -1,19 +1,14 @@
-/* Сброс стандартных отступов и настроек браузера */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
-
-/* Основные стили страницы */
 body {
     font-family: 'Arial', sans-serif;
     line-height: 1.6;
     color: #333;
     background-color: #f4f4f4;
 }
-
-/* Шапка сайта */
 .header {
     background: #2c3e50;
     color: white;
@@ -53,8 +48,6 @@ body {
 .nav-links a:hover {
     color: #3498db;
 }
-
-/* Главный баннер */
 .hero {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -63,7 +56,7 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
-    margin-top: 60px; /* Учитываем высоту фиксированной шапки */
+    margin-top: 60px;
 }
 
 .hero-content h2 {
@@ -91,8 +84,6 @@ body {
     background: #c0392b;
     transform: translateY(-2px);
 }
-
-/* Секция мероприятий */
 .events-section {
     padding: 4rem 2rem;
     max-width: 1200px;
@@ -112,7 +103,7 @@ body {
     gap: 2rem;
 }
 
-/* Карточка мероприятия (будет заполняться через JS) */
+/* Карточка мероприятия будет заполняться через js */
 .event-card {
     background: white;
     border-radius: 10px;
@@ -165,8 +156,6 @@ body {
 .book-button:hover {
     background: #2980b9;
 }
-
-/* Секция "О зале" */
 .about-section {
     background: white;
     padding: 4rem 2rem;
@@ -199,7 +188,7 @@ body {
     margin-bottom: 0.5rem;
 }
 
-/* Подвал */
+/* футер вонючий */
 .footer {
     background: #2c3e50;
     color: white;
@@ -242,8 +231,6 @@ body {
 .close:hover {
     color: #333;
 }
-
-/* Адаптивность для мобильных */
 @media (max-width: 768px) {
     .nav {
         flex-direction: column;
@@ -269,7 +256,6 @@ body {
     font-size: 1.2rem;
     color: #666;
 }
-/* Улучшенные стили карточек мероприятий */
 .event-card {
     position: relative;
     background: white;
@@ -327,8 +313,6 @@ body {
     font-size: 0.8rem;
     z-index: 2;
 }
-
-/* Система рейтинга */
 .rating {
     display: flex;
     gap: 2px;
@@ -343,8 +327,6 @@ body {
 .star.empty {
     color: #ddd;
 }
-
-/* Цена билета */
 .event-price {
     font-size: 1.5rem;
     font-weight: bold;
@@ -356,7 +338,6 @@ body {
     font-size: 0.9rem;
     color: #666;
 }
-/* Стили для форм */
 .booking-form {
     max-width: 100%;
 }
@@ -401,8 +382,6 @@ body {
     margin-top: 0.25rem;
     display: block;
 }
-
-/* Кнопки форм */
 .form-actions {
     display: flex;
     gap: 1rem;
@@ -440,8 +419,6 @@ body {
 .btn-secondary:hover {
     background: #7f8c8d;
 }
-
-/* Стили успешного бронирования */
 .booking-success {
     text-align: center;
 }
@@ -468,7 +445,6 @@ body {
 .success-actions {
     margin-top: 1.5rem;
 }
-/* Стили для схемы зала */
 .seat-selection {
     margin: 2rem 0;
 }
@@ -525,8 +501,6 @@ body {
     align-items: center;
     justify-content: center;
 }
-
-/* Состояния мест */
 .seat-free {
     background: #27ae60;
     color: white;
@@ -557,8 +531,6 @@ body {
 .seat-vip.seat-free:hover {
     background: linear-gradient(135deg, #f1c40f, #e67e22);
 }
-
-/* Легенда мест */
 .seat-legend {
     display: flex;
     justify-content: center;
@@ -580,8 +552,6 @@ body {
     height: 20px;
     border-radius: 4px;
 }
-
-/* Информация о выборе */
 .selection-info {
     background: white;
     padding: 1.5rem;
@@ -631,7 +601,6 @@ body {
         font-size: 0.8rem;
     }
 }
-/* Стили для шагов бронирования */
 .booking-steps {
     display: flex;
     justify-content: space-between;
@@ -677,8 +646,6 @@ body {
 .booking-step.active {
     display: block;
 }
-
-/* Стили для подтверждения */
 .confirmation-section {
     background: #f8f9fa;
     padding: 1rem;
@@ -705,7 +672,6 @@ body {
     color: #7f8c8d;
     font-style: italic;
 }
-/* Улучшенные стили для мест с анимациями */
 .seat {
     width: 35px;
     height: 35px;
@@ -732,18 +698,14 @@ body {
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
     transition: left 0.5s;
 }
-
 .seat:hover::after {
     left: 100%;
 }
-
-/* Явные состояния для лучшей видимости */
 .seat-free {
     background: #27ae60;
     color: white;
     border: 2px solid #27ae60;
 }
-
 .seat-free:hover {
     background: #2ecc71;
     border-color: #2ecc71;
@@ -786,8 +748,6 @@ body {
     transform: scale(1.1);
     box-shadow: 0 4px 12px rgba(243, 156, 18, 0.4);
 }
-
-/* Улучшаем кнопку Далее */
 .btn-primary:disabled {
     background: #bdc3c7 !important;
     cursor: not-allowed !important;
@@ -799,7 +759,6 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
 }
-/* Исправляем модальное окно */
 .modal-content {
     background-color: white;
     margin: 2% auto;
@@ -807,23 +766,19 @@ body {
     border-radius: 10px;
     width: 90%;
     max-width: 800px;
-    max-height: 90vh; /* Ограничиваем высоту */
-    overflow-y: auto; /* Добавляем прокрутку */
+    max-height: 90vh;
+    overflow-y: auto;
     position: relative;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
-
-/* Уменьшаем отступы для компактности */
 .seat-map {
     background: #2c3e50;
     border-radius: 15px;
     padding: 1.5rem;
     margin: 1rem 0;
-    max-height: 400px; /* Ограничиваем высоту карты */
-    overflow-y: auto; /* Прокрутка если не помещается */
+    max-height: 400px;
+    overflow-y: auto;
 }
-
-/* Делаем кнопку "Далее" всегда видимой */
 .form-actions {
     display: flex;
     gap: 1rem;
@@ -836,15 +791,11 @@ body {
     background: white;
     z-index: 10;
 }
-
-/* Уменьшаем размеры мест для компактности */
 .seat {
     width: 30px;
     height: 30px;
     font-size: 0.7rem;
 }
-
-/* Компактная легенда */
 .seat-legend {
     display: flex;
     justify-content: center;
@@ -853,8 +804,6 @@ body {
     flex-wrap: wrap;
     font-size: 0.8rem;
 }
-
-/* Уменьшаем отступы в информации о выборе */
 .selection-info {
     background: white;
     padding: 1rem;
@@ -863,8 +812,6 @@ body {
     max-height: 200px;
     overflow-y: auto;
 }
-
-/* Адаптивность для маленьких экранов */
 @media (max-width: 768px) {
     .modal-content {
         margin: 5% auto;
@@ -888,7 +835,6 @@ body {
         margin: 0;
     }
 }
-/* Стили для уведомлений */
 .notification {
     position: fixed;
     top: 20px;
@@ -931,7 +877,6 @@ body {
         opacity: 1;
     }
 }
-/* Стиль для кнопки "Подробнее" */
 .details-button {
     background: #3498db;
     color: white;
@@ -947,7 +892,6 @@ body {
 .details-button:hover {
     background: #2980b9;
 }
-/* Стили для иконок правил на билете */
 .rules-icons {
     display: flex;
     gap: 0.8rem;

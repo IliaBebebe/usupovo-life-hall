@@ -1,23 +1,17 @@
 const API_BASE = '/api';
-// Основной объект для хранения данных приложения
 const App = {
      lastBookingData: null,
      paymentButtonClicked: false,
-    // Инициализация приложения
     init() {
         console.log('Usupovo Life Hall инициализирован');
         this.setupEventListeners();
         this.loadEventsFromAPI();
     },
-
-    // Настройка обработчиков событий
     setupEventListeners() {
-        // Закрытие модального окна
         document.querySelector('.close').addEventListener('click', () => {
             this.closeModal();
         });
         
-        // Закрытие модального окна при клике вне его
         window.addEventListener('click', (event) => {
             const modal = document.getElementById('bookingModal');
             if (event.target === modal) {
@@ -26,7 +20,6 @@ const App = {
         });
     },
     
-        // Загрузка мероприятий с сервера
     async loadEventsFromAPI() {
         try {
             console.log('🔄 Загружаем мероприятия с сервера...');
@@ -44,7 +37,7 @@ const App = {
             
         } catch (error) {
             console.error('❌ Ошибка загрузки мероприятий:', error);
-            // Fallback - используем локальные данные если сервер недоступен
+            // Fallback
             console.log('📋 Показываем тестовые мероприятия');
             const sampleEvents = [
                 {
@@ -65,8 +58,6 @@ const App = {
             this.displayEvents(sampleEvents);
         }
     },
-    
-    // Отображение мероприятий на странице
     displayEvents(events) {
         const container = document.getElementById('eventsContainer');
         window.allEvents = events;
@@ -79,7 +70,6 @@ const App = {
             `;
             return;
         }
-        
         container.innerHTML = events.map(event => `
             <div class="event-card" data-event-id="${event.id}">
                 <div class="event-image">
@@ -102,7 +92,6 @@ const App = {
         `).join('');
     },
     
-    // Упрощенная генерация звезд рейтинга
     generateRatingStars(rating) {
         let stars = '';
         for (let i = 1; i <= 5; i++) {
@@ -115,7 +104,6 @@ const App = {
         return stars;
     },
     
-    // Компактный формат даты (БЕЗ года и дня недели)
     formatDate(dateString) {
         const date = new Date(dateString);
         return date.toLocaleDateString('ru-RU', {
@@ -126,7 +114,6 @@ const App = {
         });
     },
     
-    // Открытие бронирования с загрузкой мест с сервера
     async openBookingModal(eventId) {
         console.log('🚀 Открываем бронирование для мероприятия:', eventId);
         
@@ -147,7 +134,6 @@ const App = {
         const modal = document.getElementById('bookingModal');
         const modalBody = document.getElementById('modalBody');
         
-        // Показываем загрузку
         modalBody.innerHTML = `
             <div style="text-align: center; padding: 2rem;">
                 <div style="font-size: 3rem;">⏳</div>
@@ -158,7 +144,6 @@ const App = {
         modal.style.display = 'block';
         
         try {
-            // Загружаем места с сервера
             const response = await fetch(`${API_BASE}/seats/event/${eventId}`);
             
             if (!response.ok) {
@@ -168,16 +153,13 @@ const App = {
             const seats = await response.json();
             console.log('✅ Места загружены:', seats);
             
-            // Загружаем данные мероприятия для названия
             const events = await fetch(`${API_BASE}/events`).then(r => r.json());
             const event = events.find(e => e.id === eventId);
             
-            // Сохраняем название
             if (event) {
                 this.currentEventName = event.name;
             }
             
-            // Показываем форму бронирования
             this.showBookingForm(event, seats);
             
         } catch (error) {
@@ -185,7 +167,6 @@ const App = {
             this.showBookingError('Не удалось загрузить схему зала. Попробуйте позже.');
         }
     },
-    // Показ формы бронирования с реальными данными
     showBookingForm(event, seats) {
         const modalBody = document.getElementById('modalBody');
         
@@ -226,9 +207,7 @@ const App = {
             </div>
         `;
     },
-    // Генерация схемы зала из данных API
     generateSeatMapFromAPI(seats) {
-        // Группируем места по рядам
         const rows = {};
         seats.forEach(seat => {
             const row = seat.seat_label.charAt(0);
@@ -238,7 +217,6 @@ const App = {
             rows[row].push(seat);
         });
         
-        // Сортируем ряды
         const sortedRows = Object.keys(rows).sort();
         
         let html = '';
@@ -246,7 +224,6 @@ const App = {
             html += `<div class="seat-row">`;
             html += `<div class="row-label">${row}</div>`;
             
-            // Сортируем места в ряду
             rows[row].sort((a, b) => a.seat_number - b.seat_number);
             
             rows[row].forEach(seat => {
@@ -269,7 +246,6 @@ const App = {
         
         return html;
     },
-    // Выбор места (API версия)
     selectSeatFromAPI(seatLabel, seatId, price, category) {
         console.log('Выбираем место:', seatLabel, seatId, price, category);
         
@@ -285,7 +261,6 @@ const App = {
         };
         
         if (seatElement.classList.contains('seat-selected')) {
-            // Отмена выбора
             seatElement.classList.remove('seat-selected');
             seatElement.classList.add('seat-free');
             if (category === 'vip') {
@@ -293,7 +268,6 @@ const App = {
             }
             this.selectedSeats.delete(seatLabel);
         } else {
-            // Выбор места
             seatElement.classList.remove('seat-free', 'seat-vip');
             seatElement.classList.add('seat-selected');
             this.selectedSeats.set(seatLabel, seatData);
@@ -301,7 +275,6 @@ const App = {
         
         this.updateSelectionInfo();
     },
-// Добавьте этот метод после метода selectSeatFromAPI
 updateSelectionInfo() {
     const infoElement = document.getElementById('selectedSeatsInfo');
     const nextButton = document.getElementById('nextToStep2');
@@ -330,18 +303,15 @@ updateSelectionInfo() {
         nextButton.disabled = false;
     }
 },
-// Генерация компактной схемы зала
 generateCompactSeatMap() {
     const container = document.getElementById('seatMapContainer');
-    const rows = ['A', 'B', 'C', 'D']; // Меньше рядов
+    const rows = ['A', 'B', 'C', 'D'];
     
     let html = '';
     
     rows.forEach(row => {
         html += `<div class="seat-row">`;
         html += `<div class="row-label">${row}</div>`;
-        
-        // 6 мест в ряду вместо 8
         for (let i = 1; i <= 6; i++) {
             const seatId = `${row}${i}`;
             const isVip = row === 'A' || row === 'B';
@@ -361,7 +331,6 @@ generateCompactSeatMap() {
     container.innerHTML = html;
 },
 
-// Создание схемы зала (ИСПРАВЛЕННАЯ ВЕРСИЯ)
 createHallLayout() {
     const rows = ['A', 'B', 'C', 'D', 'E', 'F'];
     const layout = [];
@@ -373,8 +342,7 @@ createHallLayout() {
         for (let i = 1; i <= seatsInRow; i++) {
             const seatId = `${row}${i}`;
             const isVip = row === 'A' || row === 'B';
-            // УБИРАЕМ случайную занятость - все места свободны
-            const isOccupied = false; // Все места изначально свободны
+            const isOccupied = false;
             
             rowSeats.push({
                 id: seatId,
@@ -396,7 +364,6 @@ createHallLayout() {
     return layout;
 },
 
-// Простой выбор места
 selectSeat(seatId) {
     console.log('Выбираем место:', seatId);
     
@@ -411,12 +378,10 @@ selectSeat(seatId) {
     };
     
     if (seatElement.classList.contains('seat-selected')) {
-        // Отмена выбора
         seatElement.classList.remove('seat-selected');
         seatElement.classList.add('seat-free');
         this.selectedSeats.delete(seatId);
     } else {
-        // Выбор места
         seatElement.classList.remove('seat-free');
         seatElement.classList.add('seat-selected');
         this.selectedSeats.set(seatId, seatData);
@@ -425,7 +390,6 @@ selectSeat(seatId) {
     this.updateCompactSelectionInfo();
 },
 
-// Обновление информации о выборе - ПРОСТАЯ ВЕРСИЯ
 updateCompactSelectionInfo() {
     const infoElement = document.getElementById('selectedSeatsInfo');
     const nextButton = document.getElementById('nextToStep2');
@@ -456,7 +420,6 @@ updateCompactSelectionInfo() {
     }
 },
 
-// Добавление места в выбранные (ОБНОВЛЕННАЯ)
 addSeatToSelection(seatId, seatData) {
     if (!this.selectedSeats) {
         this.selectedSeats = new Map();
@@ -466,16 +429,13 @@ addSeatToSelection(seatId, seatData) {
     console.log('Выбранные места:', Array.from(this.selectedSeats.keys()));
 },
 
-// Удаление места из выбранных
 removeSeatFromSelection(seatId) {
     if (this.selectedSeats) {
         this.selectedSeats.delete(seatId);
     }
 },
 
-// Получение данных о месте
 getSeatData(seatId) {
-    // Временная функция - позже заменим на данные с сервера
     const isVip = seatId.startsWith('A') || seatId.startsWith('B');
     return {
         id: seatId,
@@ -485,7 +445,6 @@ getSeatData(seatId) {
     };
 },
 
-// Улучшенная функция для склонения слов
 getRussianPlural(number, one, two, five) {
     let n = Math.abs(number);
     n %= 100;
@@ -502,21 +461,17 @@ getRussianPlural(number, one, two, five) {
     return five;
 },
 
-// Навигация по шагам
 goToStep(stepNumber) {
     console.log('Переход к шагу:', stepNumber);
     
-    // Скрываем все шаги
     document.querySelectorAll('.booking-step').forEach(step => {
         step.classList.remove('active');
     });
     
-    // Убираем активность со всех шагов в навигации
     document.querySelectorAll('.booking-steps .step').forEach(step => {
         step.classList.remove('active');
     });
     
-    // Показываем выбранный шаг
     const stepElement = document.getElementById(`step${stepNumber}`);
     const stepNavElement = document.querySelector(`.step[data-step="${stepNumber}"]`);
     
@@ -525,13 +480,11 @@ goToStep(stepNumber) {
         stepNavElement.classList.add('active');
     }
     
-    // Если переходим к шагу 3, заполняем детали подтверждения
     if (stepNumber === 3) {
         this.prepareConfirmation();
     }
 },
 
-// Подготовка данных для подтверждения
 prepareConfirmation() {
     const confirmationElement = document.getElementById('confirmationDetails');
     
@@ -540,14 +493,12 @@ prepareConfirmation() {
         return;
     }
     
-    // Собираем данные формы
     const formData = {
         name: document.getElementById('customerName').value,
         email: document.getElementById('customerEmail').value,
         phone: document.getElementById('customerPhone').value
     };
     
-    // Проверяем заполненность формы
     if (!formData.name || !formData.email || !formData.phone) {
         confirmationElement.innerHTML = `
             <p style="color: #e74c3c;">Пожалуйста, заполните все обязательные поля на предыдущем шаге</p>
@@ -555,7 +506,6 @@ prepareConfirmation() {
         return;
     }
     
-    // Рассчитываем итого
     let total = 0;
     const seatsDetails = Array.from(this.selectedSeats.values()).map(seat => {
         total += seat.price;
@@ -587,7 +537,6 @@ prepareConfirmation() {
     `;
 },
 
-// Финальное подтверждение бронирования
 finalizeBooking(eventId) {
     console.log('Финальное подтверждение бронирования для мероприятия:', eventId);
     
@@ -602,13 +551,11 @@ finalizeBooking(eventId) {
         phone: document.getElementById('customerPhone').value
     };
     
-    // Простая валидация
     if (!formData.name || !formData.email || !formData.phone) {
         alert('Пожалуйста, заполните все обязательные поля');
         return;
     }
     
-    // Собираем полные данные бронирования
     const bookingData = {
         eventId: eventId,
         customerName: formData.name,
@@ -617,21 +564,19 @@ finalizeBooking(eventId) {
         seats: Array.from(this.selectedSeats.values()),
         totalAmount: Array.from(this.selectedSeats.values()).reduce((sum, seat) => sum + seat.price, 0),
         bookingTime: new Date().toISOString(),
-        bookingId: 'B' + Date.now() // Временный ID брони
+        bookingId: 'B' + Date.now()
     };
     
     console.log('Финальные данные бронирования:', bookingData);
     this.showBookingSuccess(bookingData);
 },
 
-// Обработка формы бронирования
 processBookingForm(eventId) {
     console.log('processBookingForm вызвана для eventId:', eventId);
     
     const form = document.getElementById('bookingForm');
     const formData = new FormData(form);
     
-    // Простая валидация
     const name = document.getElementById('customerName').value.trim();
     const email = document.getElementById('customerEmail').value.trim();
     const ticketCount = document.getElementById('ticketCount').value;
@@ -651,7 +596,6 @@ processBookingForm(eventId) {
         return;
     }
     
-    // Базовая валидация email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
         alert('Пожалуйста, введите корректный email');
@@ -672,7 +616,6 @@ processBookingForm(eventId) {
     this.showBookingSuccess(bookingData);
 },
     
-    // Настройка валидации формы
     setupFormValidation() {
         const inputs = document.querySelectorAll('#bookingForm input');
         inputs.forEach(input => {
@@ -686,7 +629,6 @@ processBookingForm(eventId) {
         });
     },
     
-    // Валидация отдельного поля
     validateField(field) {
         const errorElement = document.getElementById(field.name + 'Error');
         
@@ -707,22 +649,18 @@ processBookingForm(eventId) {
         return true;
     },
     
-    // Показать ошибку
     showError(field, message) {
         const errorElement = document.getElementById(field.name + 'Error');
         errorElement.textContent = message;
         field.style.borderColor = '#e74c3c';
     },
     
-    // Очистить ошибку
     clearError(field) {
         const errorElement = document.getElementById(field.name + 'Error');
         errorElement.textContent = '';
         field.style.borderColor = '#ddd';
     },
     
-    // Обработка отправки формы
-// Обработка отправки формы
 handleBooking(event, eventId) {
     console.log('=== handleBooking вызвана ===');
     console.log('eventId:', eventId);
@@ -736,7 +674,6 @@ handleBooking(event, eventId) {
     const formData = new FormData(form);
     console.log('FormData создан');
 
-    // Валидация всех полей
     let isValid = true;
     const fields = form.querySelectorAll('input[required]');
     console.log('Обязательные поля:', fields.length);
@@ -756,7 +693,6 @@ handleBooking(event, eventId) {
         return;
     }
     
-    // Собираем данные
     const bookingData = {
         eventId: eventId,
         customerName: formData.get('customerName'),
@@ -770,7 +706,6 @@ handleBooking(event, eventId) {
     console.log('Данные бронирования:', bookingData);
     this.showBookingSuccess(bookingData);
 },
-// Переход к форме покупателя (после выбора мест)
 goToCustomerForm() {
     if (!this.selectedSeats || this.selectedSeats.size === 0) {
         alert('Сначала выберите места');
@@ -817,12 +752,10 @@ goToCustomerForm() {
         </div>
     `;
 },
-// Показ деталей мероприятия
 async showEventDetails(eventId) {
     console.log('📖 Показываем детали мероприятия:', eventId);
     
     try {
-        // Загружаем данные мероприятия
         const response = await fetch(`${API_BASE}/events/${eventId}`);
         if (!response.ok) {
             throw new Error('Мероприятие не найдено');
@@ -833,7 +766,7 @@ async showEventDetails(eventId) {
         
     } catch (error) {
         console.error('❌ Ошибка загрузки мероприятия:', error);
-        // Fallback - используем базовые данные
+        // Fallback
         const events = await fetch(`${API_BASE}/events`).then(r => r.json());
         const event = events.find(e => e.id === eventId);
         if (event) {
@@ -844,13 +777,11 @@ async showEventDetails(eventId) {
     }
 },
 
-// Модальное окно с деталями мероприятия
 showEventDetailsModal(event) {
     const modal = document.getElementById('bookingModal');
     const modalBody = document.getElementById('modalBody');
     this.currentEventId = event.id;
-    this.currentEventName = event.name; // ← ВАЖНО: сохраняем название
-    // Форматируем дату
+    this.currentEventName = event.name;
     const eventDate = this.formatDate(event.date);
     
     modalBody.innerHTML = `
@@ -911,13 +842,11 @@ showEventDetailsModal(event) {
     
     modal.style.display = 'block';
 },
-// Переход к оплате
 async proceedToPayment() {
     const name = document.getElementById('customerName').value.trim();
     const email = document.getElementById('customerEmail').value.trim();
     const phone = document.getElementById('customerPhone').value.trim();
     
-    // Валидация
     if (!name || !email || !phone) {
         alert('❌ Заполните все обязательные поля');
         return;
@@ -965,11 +894,8 @@ async proceedToPayment() {
     }
 },
 
-// Показ страницы оплаты
 showPaymentPage(paymentData) {
     const modalBody = document.getElementById('modalBody');
-    
-    // Сбрасываем флаг при каждом новом показе
     this.paymentButtonClicked = false;
     
     modalBody.innerHTML = `
@@ -1019,21 +945,13 @@ showPaymentPage(paymentData) {
         </div>
     `;
     
-    // Сохраняем paymentId для подтверждения
     this.currentPaymentId = paymentData.paymentId;
 },
 
-// Открытие ссылки оплаты и активация кнопки подтверждения
 openPaymentLink(paymentUrl) {
     console.log('🔗 Открываем ссылку оплаты');
-    
-    // Открываем в новом окне
     window.open(paymentUrl, '_blank');
-    
-    // Активируем кнопку подтверждения
     this.paymentButtonClicked = true;
-    
-    // Обновляем UI
     const confirmButton = document.getElementById('confirmPaymentButton');
     const paymentStatus = document.getElementById('paymentStatus');
     const paymentLinkButton = document.getElementById('paymentLinkButton');
@@ -1053,12 +971,9 @@ openPaymentLink(paymentUrl) {
         paymentLinkButton.innerHTML = '✅ Переход выполнен';
         paymentLinkButton.style.background = '#95a5a6';
     }
-    
-    // Показываем уведомление
     this.showNotification('✅ Вы перешли к оплате. Теперь можете подтвердить оплату после завершения.', 'success');
 },
 
-// Показ уведомления (добавьте этот метод если его нет)
 showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
@@ -1070,8 +985,6 @@ showNotification(message, type = 'info') {
     `;
     
     document.body.appendChild(notification);
-    
-    // Автоматическое удаление через 5 секунд
     setTimeout(() => {
         if (notification.parentElement) {
             notification.remove();
@@ -1079,20 +992,15 @@ showNotification(message, type = 'info') {
     }, 5000);
 },
 
-// Назад к форме покупателя
 backToCustomerForm() {
     this.goToCustomerForm();
 },
 
-// Подтверждение оплаты
 async confirmPayment(paymentId) {
-    // Дополнительная проверка
     if (!this.paymentButtonClicked) {
         alert('❌ Сначала нажмите кнопку "Перейти к оплате", чтобы перейти в банк');
         return;
     }
-    
-    // Показываем загрузку
     const confirmButton = document.getElementById('confirmPaymentButton');
     if (confirmButton) {
         confirmButton.disabled = true;
@@ -1116,7 +1024,6 @@ async confirmPayment(paymentId) {
         const result = await response.json();
         
         if (result.success) {
-            // ВАРИАНТ 1: Получаем данные из pending booking (рекомендуется)
             this.showBookingSuccess({
                 bookingId: result.bookingId,
                 customerName: result.customerName || 'Не указано',
@@ -1133,8 +1040,6 @@ async confirmPayment(paymentId) {
         
     } catch (error) {
         console.error('❌ Ошибка подтверждения оплаты:', error);
-        
-        // Возвращаем кнопку в активное состояние
         if (confirmButton) {
             confirmButton.disabled = false;
             confirmButton.innerHTML = '✅ Подтвердить оплату';
@@ -1145,21 +1050,17 @@ async confirmPayment(paymentId) {
     }
 },
 
-// Назад к выбору мест
 backToSeatSelection() {
     this.closeModal();
     setTimeout(() => {
-        this.openBookingModal(1); // временно
+        this.openBookingModal(1);
     }, 300);
 },
-
-    // Финальное бронирование с отправкой на сервер
     async finalBooking() {
         const name = document.getElementById('customerName').value.trim();
         const email = document.getElementById('customerEmail').value.trim();
         const phone = document.getElementById('customerPhone').value.trim();
         
-        // Валидация
         if (!name || !email || !phone) {
             alert('❌ Заполните все обязательные поля');
             return;
@@ -1199,7 +1100,6 @@ backToSeatSelection() {
             const result = await response.json();
             console.log('✅ Бронирование успешно:', result);
             
-            // Показываем успешное бронирование
             this.showBookingSuccess({
                 bookingId: result.bookingId,
                 customerName: name,
@@ -1216,7 +1116,6 @@ backToSeatSelection() {
         }
     },
 
-    // Показ ошибки
     showBookingError(message) {
         const modalBody = document.getElementById('modalBody');
         modalBody.innerHTML = `
@@ -1230,7 +1129,7 @@ backToSeatSelection() {
             </div>
         `;
     },
-// Получить название текущего мероприятия
+
 getCurrentEventName() {
     if (this.currentEventId && window.allEvents) {
         const event = window.allEvents.find(e => e.id == this.currentEventId);
@@ -1248,12 +1147,11 @@ getCurrentEventName() {
     
     return 'Мероприятие';
 },
-// Показать успешное бронирование с билетом
+
 showBookingSuccess(bookingData) {
     const modalBody = document.getElementById('modalBody');
     this.lastBookingData = bookingData;
     
-    // Генерируем QR-код
     const qrData = this.generateQRData(bookingData);
     
     modalBody.innerHTML = `
@@ -1369,26 +1267,22 @@ showBookingSuccess(bookingData) {
         </div>
     `;
     
-    // Генерируем QR-код после отрисовки DOM
     setTimeout(() => {
         this.generateQRCode(qrData);
     }, 100);
 },
 
-// Генерация данных для QR-кода
 generateQRData(bookingData) {
     const verificationUrl = `${window.location.origin}/verify.html?ticket=${bookingData.bookingId}`;
     return verificationUrl;
 },
 
-// Для библиотеки qrcode-generator
 generateQRCode(data) {
     const qrElement = document.getElementById('qrcode');
     if (!qrElement) return;
 
     qrElement.innerHTML = '';
 
-    // Проверяем библиотеку
     const qrcode = window.qrcode;
     
     if (!qrcode) {
@@ -1397,26 +1291,18 @@ generateQRCode(data) {
     }
 
     try {
-        // Создаем QR-код
         const qr = qrcode(0, 'M');
         qr.addData(data);
         qr.make();
-        
-        // Создаем canvas
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         const size = 120;
         canvas.width = size;
         canvas.height = size;
-        
-        // Очищаем canvas
         ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(0, 0, size, size);
-        
-        // Рисуем QR-код
         const cellSize = size / qr.getModuleCount();
         ctx.fillStyle = '#000000';
-        
         for (let row = 0; row < qr.getModuleCount(); row++) {
             for (let col = 0; col < qr.getModuleCount(); col++) {
                 if (qr.isDark(row, col)) {
@@ -1438,8 +1324,6 @@ generateQRCode(data) {
         this.showQRFallback(qrElement, data);
     }
 },
-
-// Добавляем обратно функцию запасного варианта
 showQRFallback(qrElement, data) {
     const ticketId = data.split('?ticket=')[1] || 'Билет';
     
@@ -1465,13 +1349,9 @@ showQRFallback(qrElement, data) {
         </div>
     `;
 },
-
-// Печать билета - КОМПАКТНАЯ ВЕРСИЯ
 printTicket() {
     const ticket = document.querySelector('.ticket');
     if (!ticket) return;
-
-    // Получаем данные для повторной генерации QR-кода
     const qrData = this.generateQRData(this.lastBookingData);
     
     const printWindow = window.open('', '_blank');
@@ -1770,18 +1650,15 @@ printTicket() {
         </html>
     `);
     printWindow.document.close();
-    
-    // Даем время на генерацию QR-кода перед печати
     setTimeout(() => {
         printWindow.print();
-        // Закрываем окно после печати
         setTimeout(() => {
             printWindow.close();
         }, 500);
     }, 500);
 },
     
-    // Временная функция для получения мероприятия
+
     getEventById(eventId) {
         return {
             id: eventId,
@@ -1790,36 +1667,30 @@ printTicket() {
         };
     },
     
-    // Вспомогательная функция для склонения слов
     getRussianPlural(number) {
         if (number === 1) return '';
         if (number >= 2 && number <= 4) return 'а';
         return 'ов';
     },
     
-    // Закрытие модального окна
     closeModal() {
         document.getElementById('bookingModal').style.display = 'none';
     }
 };
 
-// Вспомогательные функции
 function scrollToEvents() {
     document.getElementById('events').scrollIntoView({ 
         behavior: 'smooth' 
     });
 }
 
-// Инициализация приложения когда DOM загружен
 document.addEventListener('DOMContentLoaded', function() {
     App.init();
 });
 
-// Обработка ошибок
 window.addEventListener('error', function(e) {
     console.error('Произошла ошибка:', e.error);
 });
-// Регистрация PWA
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
